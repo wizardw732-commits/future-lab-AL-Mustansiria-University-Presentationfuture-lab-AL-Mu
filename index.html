@@ -184,7 +184,9 @@ async function ask(q,fallback){
   const useWorker=WORKER_URL&&!WORKER_URL.includes('YOUR-WORKER');
   if(useWorker){
     try{const text=await askWorker(q,m.ctx,ctrl.signal);ans.textContent=text;say(text);return;}
-    catch(e){if(e&&e.name==='AbortError')return;/* fall through to claude sample / fallback */}
+    catch(e){if(e&&e.name==='AbortError')return;
+      const dbg='خطأ Worker (تشخيص مؤقت): '+(e&&e.message?e.message:String(e));
+      ans.textContent=dbg;return;}
   }
   let s=null;try{if(window.claude&&claude.use)s=await claude.use('sample');}catch(e){}
   if(!s){const a=fallback||'المساعد الحي غير متاح الآن. جرّب أحد الأسئلة الجاهزة أعلاه.';ans.textContent=a;say(a);return;}
