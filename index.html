@@ -56,9 +56,11 @@ h1{margin:0;font-size:clamp(34px,10vw,54px);font-weight:800;color:#fff;text-shad
 .back{font-family:inherit;font-weight:600;font-size:14px;color:#fff;background:rgba(255,255,255,.08);border:1px solid var(--c);border-radius:20px;padding:6px 14px;cursor:pointer}
 #view .vbtn{position:static;width:38px;height:38px}
 iframe{flex:1;width:100%;border:0;background:var(--bg)}
-.fab{position:fixed;left:14px;bottom:calc(var(--sab) + 16px);z-index:20;font-family:inherit;font-weight:800;font-size:15px;color:#04101a;border:none;border-radius:30px;padding:12px 18px;cursor:pointer;background:linear-gradient(135deg,var(--phy),var(--vio));box-shadow:0 0 20px rgba(34,230,255,.6)}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:40;max-height:78vh;overflow-y:auto;background:rgba(6,9,20,.97);border-top:2px solid var(--c);border-radius:22px 22px 0 0;padding:14px 14px calc(var(--sab) + 14px);transform:translateY(105%);transition:transform .35s ease;box-shadow:0 -10px 40px rgba(0,0,0,.6)}
-.sheet.open{transform:none}
+.askbtn{flex:none;height:38px;padding:0 14px;border-radius:20px;border:none;font-family:inherit;font-weight:800;font-size:13px;color:#04101a;background:linear-gradient(135deg,var(--phy),var(--vio));box-shadow:0 0 14px rgba(34,230,255,.55);cursor:pointer;white-space:nowrap}
+.sheetWrap{position:fixed;inset:0;z-index:40;display:none;align-items:flex-end;justify-content:center;background:rgba(2,3,8,.55);padding:0 10px calc(var(--sab) + 14px)}
+.sheetWrap.open{display:flex}
+.sheet{width:100%;max-width:420px;max-height:min(64vh,520px);overflow-y:auto;background:rgba(8,11,22,.98);border:1.5px solid var(--c);border-radius:22px;padding:12px 14px calc(var(--sab) + 12px);box-shadow:0 -6px 34px rgba(0,0,0,.55);transform:translateY(16px) scale(.98);opacity:0;transition:transform .28s ease,opacity .28s ease}
+.sheetWrap.open .sheet{transform:none;opacity:1}
 .sh{display:flex;align-items:center;justify-content:space-between;font-weight:800;color:var(--c)}
 .sh button{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
@@ -101,16 +103,17 @@ iframe{flex:1;width:100%;border:0;background:var(--bg)}
 </section>
 
 <section class="screen" id="view">
-  <div class="bar"><button class="back" id="backBtn">▶ رجوع</button><h4 id="vt"></h4><button class="vbtn" id="vv2">🔊</button></div>
+  <div class="bar"><button class="back" id="backBtn">▶ رجوع</button><h4 id="vt"></h4><button class="askbtn" id="fab">🤖 اسأل</button><button class="vbtn" id="vv2">🔊</button></div>
   <iframe id="fr" allow="autoplay"></iframe>
-  <button class="fab" id="fab">🤖 اسأل الذكاء الاصطناعي</button>
 </section>
 
+<div class="sheetWrap" id="sheetWrap">
 <div class="sheet" id="sheet">
   <div class="sh"><span id="sht">🤖 المساعد الذكي</span><button id="shx">✕</button></div>
   <div class="chips" id="chips"></div>
   <div id="ans">اختر سؤالاً أو اكتب سؤالك...</div>
   <div class="in"><input id="q" placeholder="اكتب سؤالك هنا..." enterkeyhint="send"><button id="mic" style="display:none">🎤</button><button id="send">إرسال</button></div>
+</div>
 </div>
 <button class="vbtn" id="vv1">🔊</button>
 <div id="flash"><span id="fi"></span></div>
@@ -123,21 +126,27 @@ const META={
  bio:{n:'الأحياء: الدورة الدموية',c:'#ff2e7e',i:'🫀',
   say:'قسم الأحياء. اضغط اجري لترى القلب يسرع، أو اكشف الداخل بالأشعة.',
   ctx:'الدورة الدموية: القلب والشرايين والأوردة والدم، وماذا يحدث لنبض القلب عند الجري، وكيف يستخدم الذكاء الاصطناعي في تحليل تخطيط القلب والأشعة.',
-  chips:[['لماذا يسرع القلب عند الجري؟','عند الجري تحتاج عضلاتك أكسجين وطاقة أكثر بسرعة. فيرسل الدماغ إشارة للقلب ليضخ الدم أسرع وأقوى، فيصل الأكسجين للعضلات بسرعة ويرتفع النبض من نحو 72 إلى أكثر من 150 نبضة في الدقيقة.'],['ما الفرق بين الشرايين والأوردة؟','الشرايين تحمل الدم الغني بالأكسجين من القلب إلى أجزاء الجسم، وجدرانها سميكة لتتحمل ضغط الضخ. أما الأوردة فتعيد الدم إلى القلب، وفيها صمامات صغيرة تمنعه من الرجوع للخلف.'],['كيف يفيد الذكاء الاصطناعي في القلب؟','يقرأ الذكاء الاصطناعي تخطيط القلب والأشعة بسرعة ودقة، ويكتشف أنماطاً صغيرة قد لا تراها العين، فيساعد الأطباء على اكتشاف المرض مبكراً.']]},
+  chips:[['لماذا يسرع القلب عند الجري؟','عند الجري تحتاج عضلاتك أكسجين وطاقة أكثر بسرعة. فيرسل الدماغ إشارة للقلب ليضخ الدم أسرع وأقوى، فيصل الأكسجين للعضلات بسرعة ويرتفع النبض من نحو 72 إلى أكثر من 150 نبضة في الدقيقة.'],['ما الفرق بين الشرايين والأوردة؟','الشرايين تحمل الدم الغني بالأكسجين من القلب إلى أجزاء الجسم، وجدرانها سميكة لتتحمل ضغط الضخ. أما الأوردة فتعيد الدم إلى القلب، وفيها صمامات صغيرة تمنعه من الرجوع للخلف.'],['كيف يفيد الذكاء الاصطناعي في القلب؟','يقرأ الذكاء الاصطناعي تخطيط القلب والأشعة بسرعة ودقة، ويكتشف أنماطاً صغيرة قد لا تراها العين، فيساعد الأطباء على اكتشاف المرض مبكراً.'],['كم غرفة في القلب؟','القلب فيه أربع غرف: أذينان في الأعلى وبطينان في الأسفل. الأذينان يستقبلان الدم، والبطينان يضخانه خارج القلب.']]},
  phy:{n:'الفيزياء: الليزر و LIDAR',c:'#22e6ff',i:'🔴',
   say:'قسم الفيزياء. الروبوت يرسل الليزر ويقيس زمن رجوعه ليعرف المسافة. جرب أن تسحب العوائق.',
   ctx:'الليزر وتقنية LIDAR: قياس المسافة من زمن رجوع الضوء (المسافة = سرعة الضوء × الزمن ÷ 2)، السيارات الذاتية والروبوتات، وسحابة النقاط وكيف يستخدمها الذكاء الاصطناعي لتجنب العوائق.',
-  chips:[['كيف يقيس الليزر المسافة؟','يرسل الجهاز نبضة ليزر، فتصطدم بالجسم وترجع. نقيس الزمن الذي استغرقته، ونضربه في سرعة الضوء ونقسم على اثنين لأن الضوء ذهب ورجع، فنحصل على المسافة.'],['لماذا نقسم على 2؟','لأن الزمن المقاس هو زمن الذهاب والإياب معاً، والمسافة التي نريدها هي الذهاب فقط، لذلك نأخذ نصف الزمن.'],['كيف تستخدم السيارة الذاتية الليزر؟','ترسل السيارة آلاف النبضات كل ثانية فتبني خريطة ثلاثية الأبعاد من النقاط حولها، ثم يحلل الذكاء الاصطناعي الخريطة ليعرف أين السيارات والمشاة فيقرر متى تتوقف أو تنعطف.']]},
+  chips:[['كيف يقيس الليزر المسافة؟','يرسل الجهاز نبضة ليزر، فتصطدم بالجسم وترجع. نقيس الزمن الذي استغرقته، ونضربه في سرعة الضوء ونقسم على اثنين لأن الضوء ذهب ورجع، فنحصل على المسافة.'],['لماذا نقسم على 2؟','لأن الزمن المقاس هو زمن الذهاب والإياب معاً، والمسافة التي نريدها هي الذهاب فقط، لذلك نأخذ نصف الزمن.'],['كيف تستخدم السيارة الذاتية الليزر؟','ترسل السيارة آلاف النبضات كل ثانية فتبني خريطة ثلاثية الأبعاد من النقاط حولها، ثم يحلل الذكاء الاصطناعي الخريطة ليعرف أين السيارات والمشاة فيقرر متى تتوقف أو تنعطف.'],['هل الليزر خطر على العين؟','ليزر LIDAR المستخدم في الروبوتات ضعيف جداً ومصمم بطاقة آمنة، لكن أي ليزر قوي يمكن أن يؤذي العين، لذلك دائماً نتجنب النظر مباشرة إلى أي شعاع ليزر.']]},
  mat:{n:'الرياضيات: فيثاغورس',c:'#c6ff5e',i:'📐',
   say:'قسم الرياضيات. اسحب الكنز وابدأ السباق، أو جرب التحدي.',
   ctx:'نظرية فيثاغورس (a²+b²=c²) في المثلث القائم، حساب المسافة المستقيمة مقابل السير على الضلعين، امتدادها لثلاثة أبعاد، وكيف يستخدمها الذكاء الاصطناعي والروبوتات في إيجاد أقصر مسار.',
-  chips:[['ما هي نظرية فيثاغورس؟','في المثلث القائم الزاوية، مربع الوتر (الضلع الأطول) يساوي مجموع مربعي الضلعين الآخرين: a² + b² = c². مثلاً 3² + 4² = 9 + 16 = 25، فالوتر = 5.'],['لماذا الخط المستقيم أقصر؟','لأن الوتر دائماً أقصر من مجموع الضلعين الآخرين. في مثالنا الطريق بالخطوط 3 + 4 = 7 أمتار، أما المستقيم فخمسة أمتار فقط.'],['أين يستخدم الذكاء الاصطناعي فيثاغورس؟','الروبوتات وتطبيقات الخرائط تحسب المسافة بين نقطتين بهذه المعادلة، وتبحث عن أقصر مسار لتوفر الوقت والطاقة.']]}
+  chips:[['ما هي نظرية فيثاغورس؟','في المثلث القائم الزاوية، مربع الوتر (الضلع الأطول) يساوي مجموع مربعي الضلعين الآخرين: a² + b² = c². مثلاً 3² + 4² = 9 + 16 = 25، فالوتر = 5.'],['لماذا الخط المستقيم أقصر؟','لأن الوتر دائماً أقصر من مجموع الضلعين الآخرين. في مثالنا الطريق بالخطوط 3 + 4 = 7 أمتار، أما المستقيم فخمسة أمتار فقط.'],['أين يستخدم الذكاء الاصطناعي فيثاغورس؟','الروبوتات وتطبيقات الخرائط تحسب المسافة بين نقطتين بهذه المعادلة، وتبحث عن أقصر مسار لتوفر الوقت والطاقة.'],['هل تنفع النظرية إلا بالمثلث القائم؟','نعم، نظرية فيثاغورس تنطبق فقط على المثلث القائم الزاوية، أي الذي فيه زاوية تساوي 90 درجة.']]}
 };
 let cur=null,voice=true;
+const WORKER_URL='https://noisy-breeze-30da.wizardw732.workers.dev';
 /* voice */
-let voices=[];function lv(){voices=window.speechSynthesis?speechSynthesis.getVoices():[];}
+let voices=[],bestVoice=null;function lv(){voices=window.speechSynthesis?speechSynthesis.getVoices():[];pickVoice();}
 if('speechSynthesis' in window){lv();speechSynthesis.onvoiceschanged=lv;}
-function say(t){if(!voice||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='ar-SA';u.rate=.95;const v=voices.find(v=>v.lang&&v.lang.startsWith('ar'));if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}}
+function pickVoice(){const ar=voices.filter(v=>v.lang&&v.lang.toLowerCase().startsWith('ar'));if(!ar.length){bestVoice=null;return;}
+ const priority=[/naayf/i,/hamed/i,/majed/i,/omar/i,/youssef|yousef/i,/khalid/i,/tarek/i,/karim/i,/fahd/i];
+ for(const p of priority){const v=ar.find(v=>p.test(v.name));if(v){bestVoice=v;return;}}
+ const notFemale=ar.find(v=>!/female|zeina|salma|laila|hoda|amira|zariah/i.test(v.name));
+ bestVoice=notFemale||ar[0];}
+function say(t){if(!voice||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='ar-SA';u.rate=.93;u.pitch=1;if(bestVoice)u.voice=bestVoice;speechSynthesis.speak(u);}catch(e){}}
 function setVoice(v){voice=v;$('vv1').textContent=$('vv2').textContent=v?'🔊':'🔇';if(!v&&window.speechSynthesis)speechSynthesis.cancel();}
 $('vv1').onclick=$('vv2').onclick=()=>setVoice(!voice);
 /* screens */
@@ -154,20 +163,34 @@ function enter(k){
 $('backBtn').onclick=()=>{$('fr').srcdoc='';closeSheet();if(window.speechSynthesis)speechSynthesis.cancel();show('menu');paused=false;};
 /* AI */
 const sheet=$('sheet'),ans=$('ans'),qi=$('q');
+$('sheetWrap').addEventListener('click',e=>{if(e.target.id==='sheetWrap')closeSheet();});
 function openSheet(){const m=META[cur];sheet.style.setProperty('--c',m.c);$('sht').textContent='🤖 المساعد الذكي — '+m.n;
   $('chips').innerHTML='';m.chips.forEach(([q,a])=>{const b=document.createElement('button');b.className='chip';b.textContent=q;b.onclick=()=>ask(q,a);$('chips').appendChild(b);});
-  ans.textContent='اختر سؤالاً أو اكتب سؤالك...';sheet.classList.add('open');}
-function closeSheet(){sheet.classList.remove('open');}
+  ans.textContent='اختر سؤالاً أو اكتب سؤالك...';$('sheetWrap').classList.add('open');}
+function closeSheet(){$('sheetWrap').classList.remove('open');}
 $('fab').onclick=openSheet;$('shx').onclick=closeSheet;
 let ctrl=null;
+async function askWorker(q,ctxText,signal){
+  const r=await fetch(WORKER_URL,{method:'POST',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,context:ctxText})});
+  if(!r.ok)throw new Error('worker_http_'+r.status);
+  const data=await r.json();
+  if(!data||!data.text)throw new Error('worker_empty');
+  return data.text;
+}
 async function ask(q,fallback){
   if(!q.trim())return;ans.textContent='المساعد يفكر...';
+  const m=META[cur];
+  if(ctrl)ctrl.abort();ctrl=new AbortController();
+  const useWorker=WORKER_URL&&!WORKER_URL.includes('YOUR-WORKER');
+  if(useWorker){
+    try{const text=await askWorker(q,m.ctx,ctrl.signal);ans.textContent=text;say(text);return;}
+    catch(e){if(e&&e.name==='AbortError')return;/* fall through to claude sample / fallback */}
+  }
   let s=null;try{if(window.claude&&claude.use)s=await claude.use('sample');}catch(e){}
-  if(!s){const a=fallback||'المساعد الحي غير متاح الآن، جرّب أحد الأسئلة الجاهزة أعلاه.';ans.textContent=a;say(a);return;}
+  if(!s){const a=fallback||'المساعد الحي غير متاح الآن. جرّب أحد الأسئلة الجاهزة أعلاه.';ans.textContent=a;say(a);return;}
   try{
-    if(ctrl)ctrl.abort();ctrl=new AbortController();
-    const m=META[cur];
-    const p='أنت مساعد ذكي ودود داخل عرض جامعي تفاعلي لطلاب الابتدائية والمتوسطة في العراق. القسم الحالي: '+m.ctx+'\nأجب بالعربية الفصحى المبسطة وبجمل قصيرة (3 إلى 5 جمل)، مع مثال واقعي، وأشر إلى علاقة الموضوع بالذكاء الاصطناعي عند المناسبة. لا تستخدم رموز تنسيق أو نجوم. إن كان السؤال بعيداً عن العلم فوجّه الطالب بلطف للقسم.\n\nسؤال الطالب: '+q;
+    const persona='أنت Paradox، مساعد ذكاء اصطناعي ذكي وواثق وعنده خفة دم خفيفة، تشرح داخل عرض جامعي تفاعلي لطلاب الابتدائية والمتوسطة في العراق. مباشر وما تكثر الحشو، بس ودود مع الأطفال. إذا الطالب كتب بالعامية العراقية جاوبه بالعامية العراقية البسيطة، وإذا كتب فصيح جاوبه فصيح.';
+    const p=persona+'\n\nالقسم الحالي: '+m.ctx+'\nأجب بجمل قصيرة (3 إلى 5 جمل)، مع مثال واقعي، وأشر إلى علاقة الموضوع بالذكاء الاصطناعي عند المناسبة. لا تستخدم رموز تنسيق أو نجوم. إن كان السؤال بعيداً عن العلم فوجّه الطالب بلطف للقسم.\n\nسؤال الطالب: '+q;
     const r=await s([{role:'user',content:p}],{cache:false,signal:ctrl.signal,onText:({text})=>{ans.textContent=text;}});
     ans.textContent=r.text;say(r.text);
   }catch(e){if(e&&e.code==='cancelled')return;const a=fallback||'تعذر الوصول للمساعد الآن، حاول مرة ثانية.';ans.textContent=a;say(a);}
