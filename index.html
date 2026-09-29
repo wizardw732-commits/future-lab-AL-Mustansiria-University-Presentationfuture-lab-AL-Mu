@@ -172,9 +172,9 @@ $('fab').onclick=openSheet;$('shx').onclick=closeSheet;
 let ctrl=null;
 async function askWorker(q,ctxText,signal){
   const r=await fetch(WORKER_URL,{method:'POST',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,context:ctxText})});
-  if(!r.ok)throw new Error('worker_http_'+r.status);
-  const data=await r.json();
-  if(!data||!data.text)throw new Error('worker_empty');
+  let data=null;try{data=await r.json();}catch(e){}
+  if(!r.ok)throw new Error('HTTP '+r.status+' — '+(data&&data.text?data.text:'(بدون تفاصيل من السيرفر)'));
+  if(!data||!data.text)throw new Error('رد فاضي من السيرفر');
   return data.text;
 }
 async function ask(q,fallback){
